@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Anti-DDoS Service</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            overflow-x: hidden;
+        }
+        .sidebar {
+            background-color: #1a1a1a;
+            color: #ddd;
+            min-height: 100vh;
+            border-right: 3px solid #007bff;
+        }
+        .sidebar a {
+            color: #ddd;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        .main-content {
+            background-color: #212121;
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+            transition: margin-left 0.5s;
+        }
+        .card {
+            background-color: #34495e;
+            border: none;
+            box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #222;
+            color: #fff;
+            padding: 10px 20px;
+        }
+        .footer {
+            background-color: #222;
+            color: #fff;
+            text-align: center;
+            padding: 10px 20px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .statistics {
+            background-color: #991a2b;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        }
+        .statistics h4 {
+            color: #fff;
+        }
+        .statistics p {
+            color: #ddd;
+            font-size: 1.2em;
+        }
+        .statistics i {
+            font-size: 2em;
+            margin-right: 10px;
+        }
+        .timeline {
+            background-color: #991a2b;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+            color: #fff;
+        }
+        .timeline .event {
+            padding: 10px 0;
+            border-bottom: 1px solid #991a2b;
+        }
+        .timeline .event:last-child {
+            border-bottom: none;
+        }
+        .timeline .event i {
+            margin-right: 10px;
+        }
+        .timeline .event p {
+            margin: 0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h4>Anti-DDoS Service Dashboard</h4>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 sidebar">
+                <h5 class="text-center mt-3 mb-4">Menu</h5>
+                <a href="#"><i class="fas fa-home"></i> Home</a>
+                <a href="#"><i class="fas fa-user-shield"></i> Manage Domains</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Analytics</a>
+                <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+
+            <div class="col-md-10 main-content">
+                <h2>Welcome, User!</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-4">
+                            <h5>Total Users</h5>
+                            <p><i class="fas fa-users"></i> 150</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-4">
+                            <h5>Domains Protected</h5>
+                            <p><i class="fas fa-shield-alt"></i> 75</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-4">
+                            <h5>Attacks Blocked</h5>
+                            <p><i class="fas fa-ban"></i> 320</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="statistics">
+                            <h4>Monthly Statistics</h4>
+                            <p><i class="fas fa-chart-bar"></i> 420 Domains Protected</p>
+                            <p><i class="fas fa-user-shield"></i> 30 New Users</p>
+                            <p><i class="fas fa-ban"></i> 250 Attacks Blocked</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="timeline">
+                            <h4>Recent Activities</h4>
+                            <div class="event">
+                                <p><i class="fas fa-user-plus"></i> New user registered</p>
+                                <p>5 mins ago</p>
+                            </div>
+                            <div class="event">
+                                <p><i class="fas fa-shield-alt"></i> Domain example.com protected</p>
+                                <p>30 mins ago</p>
+                            </div>
+                            <div class="event">
+                                <p><i class="fas fa-ban"></i> DDoS attack blocked on domain example.net</p>
+                                <p>1 hour ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2023 Anti-DDoS Service. All Rights Reserved.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

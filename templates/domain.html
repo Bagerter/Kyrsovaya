@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    /* The switch - the box around the slider */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    /* The slider */
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
+
+    input:checked+.slider {
+      background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
+
+    .slider.round:before {
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-900 text-white flex">
+
+  <!-- Sidebar -->
+  <div class="w-64 h-screen bg-gray-800 p-5 flex flex-col flex-shrink-0 justify-between">
+    <div>
+      <h1 class="text-3xl font-bold mb-10 text-red-600">AntiDDoS</h1>
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="/dash" class="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+              <i class="fas fa-home mr-3 text-lg"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="/domains"
+              class="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+              <i class="fas fa-globe mr-3 text-lg"></i>
+              Domains
+            </a>
+          </li>
+          <!-- Add more sidebar items here -->
+        </ul>
+      </nav>
+    </div>
+    <div>
+      <a href="/logout"
+        class="flex items-center justify-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+        <i class="fas fa-sign-out-alt mr-3 text-lg"></i>
+        Logout
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col">
+
+    <!-- Header -->
+    <div class="px-8 py-4 bg-gray-800 flex justify-between items-center">
+      <h2 class="text-xl font-semibold text-white">Domain Management</h2>
+      <button id="myBtn" class="px-4 py-2 bg-red-600 hover:bg-red-700 focus:outline-none rounded-md">
+        Add Your Domain
+      </button>
+    </div>
+
+    <!-- Domain List and Stats -->
+    <div class="flex-1 px-8 py-4 overflow-y-auto">
+      <!-- Domain items will be added here -->
+      <div id="domainList" class="space-y-4"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="px-8 py-4 bg-gray-800">
+      <p class="text-center text-gray-600">© 2024 AntiDDoS. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- The Modal -->
+  <!-- ...existing modal structure... -->
+  <div id="myModal" class="modal hidden fixed z-10 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50">
+    <!-- Modal content -->
+    <div class="modal-content container mx-auto p-5 bg-gray-800 mt-20 mb-20 rounded-md text-left">
+      <div class="flex justify-between items-center pb-3">
+        <p class="text-2xl font-bold">Add Domain</p>
+        <div class="modal-close cursor-pointer z-50" onclick="toggleModal('myModal', false)">
+          <i class="fas fa-times text-red-500"></i>
+        </div>
+      </div>
+      <form id="domainForm">
+        <div class="mb-4">
+          <label for="domainName" class="block text-gray-500">Domain Name</label>
+          <input type="text" id="domainName" name="domainName" placeholder="Enter your domain"
+            class="w-full p-2 rounded bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white">
+        </div>
+        <div class="mb-4">
+          <label for="IpName" class="block text-gray-500">IP server</label>
+          <input type="text" id="IpName" name="IpName" placeholder="Enter your IP server"
+            class="w-full p-2 rounded bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white">
+        </div>
+        <div class="mb-4">
+          <label for="cloudflare" class="block text-gray-500">Cloudflare</label>
+          <label class="switch">
+            <input type="checkbox" id="cloudflare" name="cloudflare">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="mb-4">
+          <label for="ratelimit" class="block text-gray-500">Ratelimit (requests per minute)</label>
+          <input type="number" id="ratelimit" name="ratelimit" placeholder="Enter rate limit"
+            class="w-full p-2 rounded bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white">
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 focus:outline-none rounded-md">
+          Save Domain
+        </button>
+      </form>
+    </div>
+  </div>
+  <!-- The Edit Modal -->
+  <div id="editModal" class="modal hidden fixed z-10 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50">
+    <!-- Modal content -->
+    <div class="modal-content container mx-auto p-5 bg-gray-800 mt-20 mb-20 rounded-md text-left">
+      <div class="flex justify-between items-center pb-3">
+        <p class="text-2xl font-bold">Edit Domain</p>
+        <div class="modal-close cursor-pointer z-50" onclick="toggleModal('editModal', false)">
+          <i class="fas fa-times text-red-500"></i>
+        </div>
+      </div>
+      <form id="editDomainForm"> <!-- Измените идентификатор формы -->
+        <div class="mb-4">
+          <label for="editDomainName" class="block text-gray-500">Domain Name</label>
+          <input type="text" id="editDomainName" name="domainName" placeholder="Enter your domain"
+            class="w-full p-2 rounded bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white">
+        </div>
+        <div class="mb-4">
+          <label for="editIpName" class="block text-gray-500">IP server</label>
+          <input type="text" id="editIpName" name="IpName" placeholder="Enter your IP server"
+            class="w-full p-2 rounded bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white">
+        </div>
+        <div class="mb-4">
+          <label for="editCloudflare" class="block text-gray-500">Cloudflare</label>
+          <label class="switch">
+            <input type="checkbox" id="editCloudflare" name="cloudflare">
+            <span class="slider round"></span>
+          </label>
+        </div>
+        <div class="mb-4">
+          <label for="editRatelimit" class="block text-gray-500">Ratelimit (requests per minute)</label>
+          <input type="number" id="editRatelimit" name="ratelimit" placeholder="Enter rate limit"
+            class="w-full p-2 rounded bg-gray-700 border-2 border-gray-600 focus:border-blue-500 text-white">
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 focus:outline-none rounded-md">
+          Update Domain
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ...existing scripts... -->
+  <script>
+    // Загрузка доменов при загрузке страницы
+    document.addEventListener("DOMContentLoaded", function () {
+      fetchDomains();
+    });
+
+    // Функция для загрузки и отображения доменов
+    function fetchDomains() {
+      fetch('/req/domains')
+        .then(response => {
+          if (!response.ok) throw new Error('Network response was not ok');
+          return response.json();
+        })
+        .then(domains => {
+          const domainList = document.getElementById("domainList");
+          domainList.innerHTML = '';
+          domains.forEach(domain => addDomainToDOM(domain));
+        })
+        .catch(error => console.error('Error fetching domains:', error));
+    }
+    function viewDomainStats(domainId) {
+      // Переход на страницу статистики для домена с заданным ID
+      window.location.href = `/domain-stats/${domainId}`;
+    }
+    // Функция для добавления домена в DOM
+    function addDomainToDOM(domain) {
+      const domainItem = document.createElement("div");
+      domainItem.className = "domain-item p-4 bg-gray-700 rounded-lg flex justify-between items-center mb-2";
+      domainItem.innerHTML = `
+        <div>
+          <h3 class="text-lg font-bold">${domain.name}</h3>
+          <p>Ip: ${domain.Ip}</p>
+          <p>Cloudflare: ${domain.cloudflare ? 'Enabled' : 'Disabled'}</p>
+          <p>Rate Limit: ${domain.ratelimit} requests/min</p>
+        </div>
+        <div>
+          <button class="edit-btn px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md mr-2">Edit</button>
+          <button class="delete-btn px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md" data-id="${domain.id}">Delete</button>
+          <button class="stats-btn px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md" data-id="${domain.id}" onclick="viewDomainStats(${domain.id})">Stats</button>
+        </div>
+      `;
+      document.getElementById("domainList").appendChild(domainItem);
+
+      // Привязка событий к кнопкам редактирования и удаления
+      domainItem.querySelector('.edit-btn').addEventListener('click', () => prepareEditModal(domain));
+      domainItem.querySelector('.delete-btn').addEventListener('click', () => deleteDomain(domain.id));
+    }
+
+    // Функция для открытия модального окна добавления
+    document.getElementById("myBtn").addEventListener("click", () => toggleModal("myModal", true));
+
+    // Функция для открытия и закрытия модальных окон
+    function toggleModal(modalId, isOpen) {
+      const modal = document.getElementById(modalId);
+      modal.style.display = isOpen ? "block" : "none";
+    }
+
+    // Функция для подготовки модального окна редактирования
+    function prepareEditModal(domain) {
+      const modal = document.getElementById("editModal");
+      document.getElementById("editDomainName").value = domain.name;
+      document.getElementById("editIpName").value = domain.Ip;
+      document.getElementById("editCloudflare").checked = domain.cloudflare;
+      document.getElementById("editRatelimit").value = domain.ratelimit;
+      modal.querySelector("form").dataset.id = domain.id; // Сохраняем ID для обновления
+      toggleModal("editModal", true);
+    }
+
+    // Обработка формы добавления домена
+    document.getElementById("domainForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const domainData = {
+        name: document.getElementById("domainName").value,
+        Ip: document.getElementById("IpName").value,
+        cloudflare: document.getElementById("cloudflare").checked,
+        ratelimit: parseInt(document.getElementById("ratelimit").value, 10),
+      };
+
+      fetch('/req/domains', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(domainData)
+      })
+        .then(response => response.json())
+        .then(domain => {
+          addDomainToDOM(domain);
+          toggleModal("myModal", false);
+          this.reset();
+          showNotification("Domain added successfully");
+        })
+        .catch(error => {
+          console.error('Error adding domain:', error);
+          showNotification("Error adding domain");
+        });
+    });
+
+    // Обработка формы редактирования домена
+    document.getElementById("editDomainForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const domainId = this.dataset.id;
+      const domainData = {
+        name: document.getElementById("editDomainName").value,
+        Ip: document.getElementById("editIpName").value,
+        cloudflare: document.getElementById("editCloudflare").checked,
+        ratelimit: parseInt(document.getElementById("editRatelimit").value, 10),
+      };
+
+      fetch(`/req/domains/${domainId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(domainData)
+      })
+        .then(() => {
+          fetchDomains(); // Обновляем список доменов после редактирования
+          toggleModal("editModal", false);
+          showNotification("Domain updated successfully");
+        })
+        .catch(error => {
+          console.error('Error updating domain:', error);
+          showNotification("Error updating domain");
+        });
+    });
+
+    // Функция для удаления домена
+    function deleteDomain(domainId) {
+      fetch(`/req/domains/${domainId}`, { method: 'DELETE' })
+        .then(() => {
+          fetchDomains(); // Обновляем список доменов после удаления
+          showNotification("Domain deleted successfully");
+        })
+        .catch(error => {
+          console.error('Error deleting domain:', error);
+          showNotification("Error deleting domain");
+        });
+    }
+
+    // Функция для отображения уведомлений
+    function showNotification(message) {
+      // Создаем и добавляем уведомление
+      const notification = document.createElement("div");
+      notification.className = "notification";
+      notification.innerText = message;
+      document.body.appendChild(notification);
+      // Удаляем уведомление через 3 секунды
+      setTimeout(() => notification.remove(), 3000);
+    }
+  </script>
+
+
+  <script>
+    function showNotification(message) {
+      // Создаем элемент уведомления
+      const notification = document.createElement("div");
+      notification.className = "fixed top-5 right-5 z-50 bg-green-500 text-white px-4 py-2 rounded shadow-lg";
+      notification.textContent = message;
+
+      // Добавляем уведомление в body
+      document.body.appendChild(notification);
+
+      // Автоматически скрываем уведомление через 3 секунды
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+  </script>
+
+</body>
+
+</html>

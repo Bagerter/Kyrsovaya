@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статистика домена {{ .DomainName }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- amCharts -->
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+	<style>
+	.header {
+    position: relative;
+    z-index: 1;
+}
+
+#starfield {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+}
+
+/* Стили для остальной части header, например: */
+.header-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-white flex">
+
+    <!-- Sidebar -->
+    <div class="w-64 min-h-screen bg-gray-800 p-5 flex flex-col flex-shrink-0 justify-between sm:relative sm:max-h-full sm:overflow-y-auto">
+        <div>
+            <h1 class="text-3xl font-bold mb-10 text-red-600">AntiDDoS</h1>
+            <nav>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/dash" class="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-home mr-3 text-lg"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/domains" class="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+                            <i class="fas fa-globe mr-3 text-lg"></i>
+                            Domains
+                        </a>
+                    </li>
+                    <!-- Add more sidebar items here -->
+                </ul>
+            </nav>
+        </div>
+        <div>
+            <a href="/logout" class="flex items-center justify-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+                <i class="fas fa-sign-out-alt mr-3 text-lg"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1">
+        <div class="container mx-auto p-4">
+		<div class="header">
+    <canvas id="starfield"></canvas>
+    <!-- Остальной контент header -->
+</div>
+
+            <h1 class="text-xl font-semibold mb-4">Статистика домена {{ .DomainName }}</h1>
+
+            <!-- Контейнеры с информацией -->
+<div class="flex flex-col sm:flex-row justify-around mt-6">
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold">Количество атак</h3>
+        <p id="totalAttacks">{{ .TotalAttacks }}</p>
+    </div>
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold">Количество отраженных атак</h3>
+        <p id="reflectedAttacks">{{ .ReflectedAttacks }}</p>
+    </div>
+	    <div class="bg-gray-800 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold">Максимальная мощность атаки</h3>
+        <p id="maxPower">{{ .MaxAttackPower }}</p>
+    </div>
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <h3 class="text-lg font-semibold">Среднее количество запросов с одного IP</h3>
+        <p id="reqperMin">{{ .AvgRequestsPerIP }}</p>
+    </div>
+</div>
+
+<!-- Карты мира -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <h2 class="text-lg font-semibold mb-2">Посещения по странам</h2>
+        <div id="visitsMap" style="height: 400px;"></div>
+    </div>
+    <div class="bg-gray-800 p-4 rounded-lg">
+        <h2 class="text-lg font-semibold mb-2">Атаки по странам</h2>
+        <div id="attacksMap" style="height: 400px;"></div>
+    </div>
+</div>
+
+
+<!-- Раскрывающиеся списки -->
+<div class="mt-6 space-y-4">
+    <details class="group" open>
+        <summary class="font-semibold cursor-pointer bg-gray-700 p-4 rounded-lg">
+            IP адреса посетителей
+            <i class="fas fa-chevron-down transition-transform transform group-open:rotate-180 float-right"></i>
+        </summary>
+        <div class="bg-gray-800 p-4 rounded-lg mt-2 transition-opacity duration-500 ease-in-out">
+            <!-- Список IP адресов, ASN, Country -->
+            {{ range .VisitorIPs }}
+            <p class="text-white">{{ .IP }} - {{ .ASN }} - {{ .Country }}</p>
+            {{ end }}
+        </div>
+    </details>
+    <details class="group">
+        <summary class="font-semibold cursor-pointer bg-gray-700 p-4 rounded-lg">
+            IP адреса атакующих
+            <i class="fas fa-chevron-down transition-transform transform group-open:rotate-180 float-right"></i>
+        </summary>
+        <div class="bg-gray-800 p-4 rounded-lg mt-2 transition-opacity duration-500 ease-in-out">
+            <!-- Список IP адресов, ASN, Country -->
+            {{ range .AttackerIPs }}
+            <p class="text-white">{{ .IP }} - {{ .ASN }} - {{ .Country }}</p>
+            {{ end }}
+        </div>
+    </details>
+</div>
+
+        </div>
+		    <footer class="text-center text-gray-600 p-5">
+        <p class="text-center text-gray-600">© 2023 AntiDDoS. All rights reserved.</p>
+    </footer>
+    </div>
+
+    <script>
+var visitCountriesData = JSON.parse('{{ .VisitCountriesDataJSON }}');
+var attackCountriesData = JSON.parse('{{ .AttackCountriesDataJSON }}');
+
+
+	document.addEventListener("DOMContentLoaded", function() {
+    // Карта посещений
+    am4core.ready(function() {
+        // Создание карты
+        let map = am4core.create("visitsMap", am4maps.MapChart);
+        map.geodata = am4geodata_worldLow;
+        map.projection = new am4maps.projections.Miller();
+
+        let polygonSeries = map.series.push(new am4maps.MapPolygonSeries());
+        polygonSeries.useGeodata = true;
+        
+        // Данные для демонстрации
+        polygonSeries.data = visitCountriesData.map(function(item) {
+            return { id: item.CountryCode, value: item.Value, fill: am4core.color("#F05") };
+        });
+
+        let polygonTemplate = polygonSeries.mapPolygons.template;
+        polygonTemplate.tooltipText = "{name}: {value}";
+        polygonTemplate.fill = am4core.color("#74B266");
+
+        polygonSeries.heatRules.push({
+            property: "fill",
+            target: polygonSeries.mapPolygons.template,
+            min: am4core.color("#FFD1AA"),
+            max: am4core.color("#7B3625")
+        });
+
+        map.series.push(polygonSeries);
+		map.zoomControl = new am4maps.ZoomControl();
+    });
+
+    am4core.ready(function() {
+    // Создание карты атак
+    let attacksMap = am4core.create("attacksMap", am4maps.MapChart);
+
+    // Загрузка геоданных для карты мира
+    attacksMap.geodata = am4geodata_worldLow;
+    attacksMap.projection = new am4maps.projections.Miller();
+
+    let polygonSeriesAttacks = attacksMap.series.push(new am4maps.MapPolygonSeries());
+    polygonSeriesAttacks.useGeodata = true;
+
+    // Демонстрационные данные для атак по странам
+if (attackCountriesData && Array.isArray(attackCountriesData)) {
+    polygonSeriesAttacks.data = attackCountriesData.map(function(item) {
+        return { id: item.CountryCode, value: item.Value, fill: am4core.color("#F00") };
+    });
+}
+
+    let polygonTemplateAttacks = polygonSeriesAttacks.mapPolygons.template;
+    polygonTemplateAttacks.tooltipText = "{name}: {value} атак";
+    polygonTemplateAttacks.fill = am4core.color("#74B266");
+
+    // Правила для изменения цвета в зависимости от количества атак
+    polygonSeriesAttacks.heatRules.push({
+        property: "fill",
+        target: polygonSeriesAttacks.mapPolygons.template,
+        min: am4core.color("#FFD1AA"),
+        max: am4core.color("#7B3625")
+    });
+
+    // Добавление zoomControl для удобства навигации по карте
+    attacksMap.zoomControl = new am4maps.ZoomControl();
+});
+
+});
+
+	</script>
+</body>
+</html>
+

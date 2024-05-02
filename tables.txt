@@ -1,0 +1,126 @@
+CREATE TABLE IF NOT EXISTS public.attack_info
+(
+    id integer NOT NULL DEFAULT nextval('attack_info_id_seq'::regclass),
+    domain_id integer,
+    attack_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    max_power integer,
+    requests_per_minute integer,
+    CONSTRAINT attack_info_pkey PRIMARY KEY (id),
+    CONSTRAINT attack_info_domain_id_fkey FOREIGN KEY (domain_id)
+        REFERENCES public.domains (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.attack_info
+    OWNER to postgres;
+
+CREATE TABLE IF NOT EXISTS public.attacker_ips
+(
+    id integer NOT NULL DEFAULT nextval('attacker_ips_id_seq'::regclass),
+    domain_id integer,
+    ip text COLLATE pg_catalog."default",
+    asn text COLLATE pg_catalog."default",
+    country_code text COLLATE pg_catalog."default",
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT attacker_ips_pkey PRIMARY KEY (id),
+    CONSTRAINT attacker_ips_domain_id_fkey FOREIGN KEY (domain_id)
+        REFERENCES public.domains (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.attacker_ips
+    OWNER to postgres;
+
+CREATE TABLE IF NOT EXISTS public.domain_visits
+(
+    id integer NOT NULL DEFAULT nextval('domain_visits_id_seq'::regclass),
+    domain_id integer,
+    visitor_count integer DEFAULT 0,
+    CONSTRAINT domain_visits_pkey PRIMARY KEY (id),
+    CONSTRAINT domain_visits_domain_id_fkey FOREIGN KEY (domain_id)
+        REFERENCES public.domains (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.domain_visits
+    OWNER to postgres;
+
+CREATE TABLE IF NOT EXISTS public.domains
+(
+    id integer NOT NULL DEFAULT nextval('domains_id_seq'::regclass),
+    user_id integer NOT NULL,
+    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    cloudflare boolean NOT NULL DEFAULT false,
+    ratelimit integer NOT NULL DEFAULT 0,
+    CONSTRAINT domains_pkey PRIMARY KEY (id),
+    CONSTRAINT domains_name_key UNIQUE (name),
+    CONSTRAINT domains_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES public.users (userid) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.domains
+    OWNER to postgres;
+
+CREATE TABLE IF NOT EXISTS public.newsitems
+(
+    id integer NOT NULL DEFAULT nextval('newsitems_id_seq'::regclass),
+    title character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    content text COLLATE pg_catalog."default" NOT NULL,
+    date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT newsitems_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.newsitems
+    OWNER to postgres;
+
+
+CREATE TABLE IF NOT EXISTS public.users
+(
+    userid integer NOT NULL DEFAULT nextval('users_userid_seq'::regclass),
+    username character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    mail character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    password character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT users_pkey PRIMARY KEY (userid),
+    CONSTRAINT users_mail_key UNIQUE (mail)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.users
+    OWNER to postgres
+
+
+CREATE TABLE IF NOT EXISTS public.visitor_ips
+(
+    id integer NOT NULL DEFAULT nextval('visitor_ips_id_seq'::regclass),
+    domain_id integer,
+    ip text COLLATE pg_catalog."default",
+    asn text COLLATE pg_catalog."default",
+    country_code text COLLATE pg_catalog."default",
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT visitor_ips_pkey PRIMARY KEY (id),
+    CONSTRAINT visitor_ips_domain_id_fkey FOREIGN KEY (domain_id)
+        REFERENCES public.domains (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.visitor_ips
+    OWNER to postgres;

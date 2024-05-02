@@ -1,0 +1,6 @@
+CloudFlare = false
+RateLimtiCanvas = 20
+RateLimtiJa3 = 500 
+RateLimtiASN = 20
+RateLimitIp = 20
+RateLimitVhost = 1000

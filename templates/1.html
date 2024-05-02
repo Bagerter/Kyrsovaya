@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    </link>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div class="w-64 h-screen bg-gray-800 p-5 flex flex-col flex-shrink-0 justify-between">
+            <div>
+                <h1 class="text-3xl font-bold mb-10 text-red-600">AntiDDoS</h1>
+                <nav>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="/dash"
+                                class="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+                                <i class="fas fa-home mr-3 text-lg"></i>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/domains"
+                                class="flex items-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+                                <i class="fas fa-globe mr-3 text-lg"></i>
+                                Domains
+                            </a>
+                        </li>
+                        <!-- Add more sidebar items here -->
+                    </ul>
+                </nav>
+            </div>
+            <div>
+                <a href="/logout"
+                    class="flex items-center justify-center p-2 text-base font-normal text-white rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-sign-out-alt mr-3 text-lg"></i>
+                    Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-10">
+            <div class="flex justify-between items-center">
+                <h2 class="text-4xl font-bold">Dashboard</h2>
+                <div class="relative" id="userMenuContainer">
+                    <div class="flex items-center cursor-pointer select-none" id="userMenuButton">
+                        <span class="mr-4">{{.Username}}</span>
+                        <span class="text-red-500">
+                            <i class="fas fa-user-circle fa-2x"></i>
+                        </span>
+                    </div>
+                    <div class="absolute right-0 mt-2 w-48 bg-gray-800 text-white rounded-lg shadow-xl hidden"
+                        id="userMenuDropdown">
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-700">Profile</a>
+                        <a href="/logout" class="block px-4 py-2 hover:bg-gray-700">Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-gray-400 mt-5">Welcome to AntiDDoS!</p>
+
+            <!-- Cards -->
+            <div class="grid grid-cols-3 gap-4 mt-5">
+                <!-- Card 1 -->
+                <div class="bg-gray-800 p-5 rounded-lg">
+                    <div class="flex justify-between">
+                        <div>
+                            <p class="text-gray-400">Total Users</p>
+                            <p class="text-3xl font-bold">{{.TotalUsers}}</p>
+                        </div>
+                        <div class="text-red-500">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-gray-800 p-5 rounded-lg">
+                    <div class="flex justify-between">
+                        <div>
+                            <p class="text-gray-400">Total Attacks</p>
+                            <p class="text-3xl font-bold">{{.TotalAttacks}}</p>
+                        </div>
+                        <div class="text-red-500">
+                            <i class="fas fa-skull-crossbones fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-gray-800 p-5 rounded-lg">
+                    <div class="flex justify-between">
+                        <div>
+                            <p class="text-gray-400">Total Online Boots</p>
+                            <p class="text-3xl font-bold">{{.OnlineBots}}</p>
+                        </div>
+                        <div class="text-red-500">
+                            <i class="fas fa-robot fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--News-->
+            {{if .IsAdmin}}
+            <div id="adminControls" class="mt-10 bg-gray-800 p-5 rounded-lg shadow-lg">
+                <h2 class="text-2xl font-bold text-white mb-4">Add News</h2>
+                <form id="addNewsForm" class="space-y-4">
+                    <input type="text" id="newsTitle" placeholder="Title" required
+                        class="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150 ease-in-out bg-gray-700 text-white placeholder-gray-300" />
+                    <textarea id="newsContent" placeholder="Content" required
+                        class="w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-150 ease-in-out bg-gray-700 text-white placeholder-gray-300"
+                        rows="4"></textarea>
+                    <button type="submit"
+                        class="px-6 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-bold transition duration-150 ease-in-out">Add
+                        News</button>
+                </form>
+            </div>
+            {{end}}
+
+            <div class="mt-10">
+                <h3 class="text-xl font-bold mb-5">Latest News</h3>
+                <div id="news-container">
+                    {{range .NewsItems}}
+                    <div class="bg-gray-800 p-5 rounded-lg mb-4">
+                        <h4 class="text-lg font-bold text-red-500 mb-2">{{.Title}}</h4>
+                        <p class="text-gray-400">{{.Content}}</p>
+                        <span class="text-sm text-gray-500">{{.Date}}</span>
+                    </div>
+                    {{if $.IsAdmin}}
+                    <button onclick='deleteNews({{.ID}})'
+                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Delete
+                    </button>
+                    {{end}}
+                    {{end}}
+                </div>
+            </div>
+            <!-- Graph Section -->
+            <div class="mt-10">
+                <h3 class="text-xl font-bold mb-5 text-red-500">GRAPH</h3>
+                <div class="relative bg-gray-800 rounded-lg overflow-hidden">
+                    <!-- Added overflow-hidden to contain the canvas -->
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-600 p-5">
+        <p class="text-center text-gray-600">© 2023 AntiDDoS. All rights reserved.</p>
+    </footer>
+    <script>
+        var graphLabels = {{.GraphData.Labels}};
+        var graphData = {{.GraphData.Data}};
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: graphLabels,
+        datasets: [{
+            label: 'Total attack for this week',
+            data: graphData,
+            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 3,
+            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(255, 99, 132, 1)',
+            fill: true,
+                }]
+            },
+        options: {
+            responsive: true,
+                maintainAspectRatio: false,
+                    scales: {
+                y: {
+                    beginAtZero: true,
+                        gridLines: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        fontColor: 'rgba(255, 255, 255, 0.7)'
+                    }
+                },
+                x: {
+                    gridLines: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        fontColor: 'rgba(255, 255, 255, 0.7)'
+                    }
+                }
+            },
+            legend: {
+                labels: {
+                    fontColor: 'white'
+                }
+            },
+            elements: {
+                line: {
+                    tension: 0.4 // Adds a slight curve to line
+                },
+                point: {
+                    radius: 4 // Adjust to alter the size of the point markers
+                }
+            }
+        }
+        });
+    </script>
+</body>
+<script>
+    // JavaScript to Toggle the Dropdown
+    document.getElementById('userMenuButton').addEventListener('click', function () {
+        var dropdown = document.getElementById('userMenuDropdown');
+        dropdown.classList.toggle('hidden');
+    });
+</script>
+<script>
+    document.getElementById('addNewsForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const title = document.getElementById('newsTitle').value;
+        const content = document.getElementById('newsContent').value;
+
+        // Отправка запроса на добавление новости
+        fetch('/req/news', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title, content }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Добавьте новость в DOM или обновите список новостей
+                // Показать уведомление или обновить список новостей
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    });
+
+    // Функция для удаления новости
+    function deleteNews(newsId) {
+        fetch(`/req/news/${newsId}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Удалить новость из DOM или обновить список новостей
+                // Показать уведомление или обновить список новостей
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
+
+</script>
+
+</html>
